@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>MVP Quiz Chat – Concept Showcase</title>
+  <link rel="stylesheet" href="mvp-showcase.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    /* Animation for confetti */
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-20px) scale(0.8) rotate(-10deg);
+      }
+
+      60% {
+        transform: translateY(10px) scale(1.1) rotate(10deg);
+      }
+
+      100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+    }
+
+    .confetti {
+      animation: confetti-fall 0.8s cubic-bezier(.42, 1.5, .58, 1) forwards;
+    }
+
+    /* Animated progress bar */
+    .progress-bar-outer {
+      width: 100%;
+      height: 8px;
+      background: #e0e7ff;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #272882 0%, #f59e0b 100%);
+      border-radius: 4px;
+      width: 24%;
+      transition: width 0.7s cubic-bezier(.42, 1.5, .58, 1);
+    }
+
+    /* Button tap animation */
+    .answers button:active {
+      transform: scale(0.97);
+      box-shadow: 0 1px 4px #27288244;
+    }
+
+    /* Bubble fade-in */
+    .quiz-bubble,
+    .quiz-bubble.gradient {
+      animation: bubble-in 0.5s cubic-bezier(.42, 1.5, .58, 1);
+    }
+
+    @keyframes bubble-in {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Mentor avatar pulse */
+    .bot-message.mentor span {
+      animation: mentor-pulse 1.2s infinite alternate;
+    }
+
+    @keyframes mentor-pulse {
+      0% {
+        filter: brightness(1);
+      }
+
+      100% {
+        filter: brightness(1.3);
+      }
+    }
+
+    /* Mode button active effect */
+    .mode-btn:focus {
+      outline: 2px solid #272882;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="mvp-container">
+    <!-- 1. Cuộc đối thoại có nhịp -->
+    <section>
+      <div class="section-title">1. Cuộc đối thoại có nhịp</div>
+      <div class="chat-container">
+        <div class="bot-message intro">
+          <span>🤖</span> Chuẩn bị chưa? Hôm nay tôi có <b>5 thử thách</b> cho bạn!
+        </div>
+        <div class="level-label">Level 1 – Java Basics</div>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner"></div>
+        </div>
+        <div class="quiz-bubble">
+          <span class="quiz-icon">❓</span>
+          Câu 1: Java là ngôn ngữ gì?
+          <div class="answers">
+            <button onclick="showConfetti()">A. Lập trình hướng đối tượng</button>
+            <button onclick="showConfetti()">B. Lập trình hàm</button>
+          </div>
+        </div>
+        <div class="bot-message success">
+          <span>🎉</span> Chuẩn không cần chỉnh! <span class="confetti"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Thị giác động – Tiến trình & Bubble -->
+    <section>
+      <div class="section-title">2. Thị giác động – Tiến trình & Bubble</div>
+      <div class="progress-container">
+        <div class="progress-circle">
+          <span>12/50</span>
+          <div class="rank">Rank B</div>
+        </div>
+        <div class="quiz-bubble gradient">
+          <span class="quiz-icon">📝</span>
+          Câu 13: Đâu là đặc điểm của Java?
+          <div class="answers">
+            <button onclick="showConfetti()">A. Đa hình</button>
+            <button onclick="showConfetti()">B. Không có kế thừa</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Nhân cách hóa bot – Mentor phản hồi -->
+    <section>
+      <div class="section-title">3. Nhân cách hóa bot – Mentor phản hồi</div>
+      <div class="chat-container">
+        <div class="bot-message mentor">
+          <span>🧑‍🏫</span> Sensei AI: Chuẩn không cần chỉnh! 💪
+        </div>
+        <div class="bot-message mentor">
+          <span>🧑‍🏫</span> Sensei AI: Hừm… tạm ổn, nhưng thử nghĩ lại ở góc khác xem?
+        </div>
+        <div class="bot-message mentor">
+          <span>🧑‍🏫</span> Sensei AI: Không sao, còn 47 cơ hội nữa mà 😎
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Cơ chế “wow” tâm lý – Tổng kết & bảng xếp hạng -->
+    <section>
+      <div class="section-title">4. Cơ chế “wow” tâm lý – Tổng kết & bảng xếp hạng</div>
+      <div class="summary-container">
+        <div class="avatar-bot"><span>🤖</span></div>
+        <div class="summary-title">Bạn đã hoàn thành 50 câu!</div>
+        <div class="summary-rank">Rank: <b>B</b></div>
+        <div class="summary-badge">🏅 Master of Arrays</div>
+        <div class="summary-next">Bạn sắp unlock cấp độ <b>Java Web Basics</b> nếu đạt 40/50 trở lên.</div>
+      </div>
+    </section>
+
+    <!-- 5. Chế độ tốc độ / thư giãn -->
+    <section>
+      <div class="section-title">5. Chế độ tốc độ / thư giãn</div>
+      <div class="mode-container">
+        <div class="mode-title">Chọn chế độ trải nghiệm:</div>
+        <button class="mode-btn fast">🚀 Tăng tốc (10s mỗi câu)</button>
+        <button class="mode-btn relax">🌱 Thư giãn (bot kể ví dụ vui)</button>
+      </div>
+    </section>
+  </div>
+  <script>
+    function showConfetti() {
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
+</body>
+
+</html>

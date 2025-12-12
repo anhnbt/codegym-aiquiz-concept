@@ -680,7 +680,7 @@ function renderProgressHeader() {
     return state.selectedAnswers[key] !== undefined;
   }).length;
 
-  // Compact progress text
+  // Compact progress text (desktop)
   const progressHtml = `
     <span class="font-semibold">Phần ${state.stepIndex + 1}/${
     steps.length
@@ -690,7 +690,55 @@ function renderProgressHeader() {
   `;
   document.getElementById('progress-compact').innerHTML = progressHtml;
 
-  // Question Pills in header center
+  // Mobile Step Indicator (Line 1)
+  const mobileStepNameEl = document.getElementById('mobile-step-name');
+  const mobileQuestionCountEl = document.getElementById(
+    'mobile-question-count'
+  );
+  if (mobileStepNameEl) {
+    mobileStepNameEl.textContent = `Bước ${state.stepIndex + 1}/${
+      steps.length
+    }: ${currentStep.title}`;
+  }
+  if (mobileQuestionCountEl) {
+    mobileQuestionCountEl.textContent = `Câu ${
+      state.questionIndex + 1
+    }/${totalQuestions}`;
+  }
+
+  // Mobile Stepper Dots (Line 2)
+  const mobileStepperEl = document.getElementById('mobile-stepper');
+  if (mobileStepperEl) {
+    const stepperHtml = steps
+      .map((step, stepIdx) => {
+        // Calculate if step is completed
+        const isCompleted = stepIdx < state.stepIndex;
+        const isActive = stepIdx === state.stepIndex;
+        const isPending = stepIdx > state.stepIndex;
+
+        const dotClass = isCompleted
+          ? 'completed'
+          : isActive
+          ? 'active'
+          : 'pending';
+        const dotContent = isCompleted ? '✓' : stepIdx + 1;
+
+        let html = `<div class="stepper-dot ${dotClass}">${dotContent}</div>`;
+
+        // Add connecting line after dot (except last one)
+        if (stepIdx < steps.length - 1) {
+          const lineClass = isCompleted ? 'completed' : '';
+          html += `<div class="stepper-line ${lineClass}"></div>`;
+        }
+
+        return html;
+      })
+      .join('');
+
+    mobileStepperEl.innerHTML = stepperHtml;
+  }
+
+  // Question Pills in header center (desktop)
   const pillsHtml = currentStep.questions
     .map((q, qIdx) => {
       const key = getQuestionKey(state.stepIndex, qIdx);
@@ -700,7 +748,7 @@ function renderProgressHeader() {
       return `
         <button
           onclick="jumpToQuestion(${qIdx})"
-          class="pill-question w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200"
+          class="question-pill pill-question w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200"
           style="
             ${
               isAnswered
@@ -743,7 +791,7 @@ function renderSidebar() {
             const showProgress = isActive || isCompleted;
 
             return `
-            <div class="rounded-lg transition-all" style="${
+            <div class="step-item rounded-lg transition-all" style="${
               isActive
                 ? 'background-color: rgba(39,40,130,0.08); border-left: 4px solid #f15a29; padding: 12px 12px 12px 12px;'
                 : 'padding: 12px 16px;'
@@ -767,7 +815,7 @@ function renderSidebar() {
                   <div class="text-sm font-semibold" style="color: ${
                     isActive ? '#272882' : isCompleted ? '#10b981' : '#666'
                   };">
-                    ${s.title}
+                    ${s.icon} ${s.title}
                   </div>
                 </div>
               </div>
@@ -803,7 +851,13 @@ function renderSidebar() {
     </div>
   `;
 
-  document.getElementById('sidebar').innerHTML = stepsListHtml;
+  const sidebar = document.getElementById('sidebar');
+  const stepsList = sidebar.querySelector('.steps-list');
+  if (stepsList) {
+    stepsList.innerHTML = stepsListHtml;
+  } else {
+    sidebar.innerHTML = stepsListHtml;
+  }
 }
 
 // Jump to step function (only if not locked)
@@ -828,8 +882,8 @@ function renderQuestion() {
   const selectedAnswer = state.selectedAnswers[questionKey];
 
   const html = `
-    <div class="fade-in">
-      <div class="mb-8">
+    <div class="wow animate__fadeIn" data-wow-duration="0.5s">
+      <div class="mb-8 wow animate__fadeInDown" data-wow-delay="0.1s">
         <div class="text-sm text-gray-500 mb-2">
           Câu ${state.questionIndex + 1}/${step.questions.length}
         </div>
@@ -847,10 +901,14 @@ function renderQuestion() {
             const title = isObject ? option.title : option;
             const subtitle = isObject ? option.subtitle : '';
 
+            // Staggered animation delay for each option
+            const delay = (idx * 0.1 + 0.2).toFixed(1);
+
             return `
             <button
               onclick="selectAnswer(${idx})"
-              class="card-option w-full text-left rounded-xl transition-all duration-200"
+              class="card-option w-full text-left rounded-xl transition-all duration-200 wow animate__fadeInUp"
+              data-wow-delay="${delay}s"
               style="
                 padding: 20px 24px;
                 border: 2px solid ${isSelected ? '#272882' : '#CCCCCC'};
@@ -898,6 +956,16 @@ function renderQuestion() {
   `;
 
   document.getElementById('question-card').innerHTML = html;
+
+  // Reinitialize WOW for dynamically added content
+  if (typeof WOW !== 'undefined') {
+    new WOW({
+      animateClass: 'animate__animated',
+      offset: 0,
+      mobile: true,
+      live: true,
+    }).init();
+  }
 }
 
 // AI Guide Evolution Functions
@@ -1158,9 +1226,9 @@ async function renderBubbleFeedback(answerIndex) {
   // Show loading state first
   bubble.classList.remove('hidden');
   bubble.innerHTML = `
-    <div class="slide-in-right">
-      <div class="flex items-center gap-2 mb-3">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center avatar-pulse" style="border: 3px solid #f15a29; background-color: white;">
+    <div class="wow animate__slideInRight" data-wow-duration="0.5s">
+      <div class="flex items-center gap-2 mb-3 wow animate__bounceIn" data-wow-delay="0.2s">
+        <div class="ai-avatar w-10 h-10 rounded-full flex items-center justify-center avatar-pulse" style="border: 3px solid #f15a29; background-color: white;">
           <span class="text-xl">🤔</span>
         </div>
         <div>
@@ -1176,14 +1244,24 @@ async function renderBubbleFeedback(answerIndex) {
     </div>
   `;
 
+  // Reinitialize WOW for AI feedback
+  if (typeof WOW !== 'undefined') {
+    new WOW({
+      animateClass: 'animate__animated',
+      offset: 0,
+      mobile: true,
+      live: true,
+    }).init();
+  }
+
   // Wait a bit for thinking effect
   await new Promise((resolve) => setTimeout(resolve, 600));
 
   // Update avatar and start typing
   bubble.innerHTML = `
-    <div class="slide-in-right">
+    <div class="wow animate__fadeIn" data-wow-duration="0.3s">
       <div class="flex items-center gap-2 mb-3">
-        <div class="rounded-full flex items-center justify-center ${avatarClass}" style="width: ${
+        <div class="ai-avatar rounded-full flex items-center justify-center ${avatarClass}" style="width: ${
     currentGuide.size
   }px; height: ${currentGuide.size}px; ${borderStyle} background-color: white;">
           <span class="text-xl">${avatar}</span>
